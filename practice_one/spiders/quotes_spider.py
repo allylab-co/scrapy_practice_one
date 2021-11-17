@@ -1,6 +1,6 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from itemloaders.processors import TakeFirst, MapCompose, Join
+from itemloaders.processors import TakeFirst, MapCompose, Join, Identity
 from w3lib.html import remove_tags
 
 
@@ -15,7 +15,7 @@ class QuotesItem(scrapy.Item):
     )
     tags = scrapy.Field(
         input_processor=MapCompose(remove_tags),
-        output_processor=TakeFirst()
+        output_processor=Identity()
     )
 
 
@@ -27,14 +27,15 @@ class QuotesSpider(scrapy.Spider):
 
     def parse(self, response):
         for quote in response.xpath('//div[@class="quote"]'):
-            l = ItemLoader(item=QuotesItem(), selector=quote)
-            l.add_xpath('quote_text', './/span/text()')
-            l.add_xpath('author', './/span[2]/small/text()')
-            l.add_xpath('tags', './/div/a/text()')
+            load = ItemLoader(item=QuotesItem(), selector=quote)
+            load.add_xpath('quote_text', './/span/text()')
+            load.add_xpath('author', './/span[2]/small/text()')
+            load.add_xpath('tags', './/div/a/text()')
 
-            yield l.load_item()
+            yield load.load_item()
 
-        next_page = response.css('.next a').attrib['href']
-        if next_page is not None:
-            yield response.follow(next_page, callback=self.parse)
+        if 'href' in response.css('.next a').attrib:
+            next_page = response.css('.next a').attrib['href']
+            if next_page is not None:
+                yield response.follow(next_page, callback=self.parse)
 
