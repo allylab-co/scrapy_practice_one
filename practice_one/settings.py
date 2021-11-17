@@ -19,6 +19,10 @@ NEWSPIDER_MODULE = 'practice_one.spiders'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
+PROXY_POOL_ENABLED = True
+PROXY_POOL_BAN_POLICY = 'practice_one.ban_policy.PolicyOne'
+PROXY_POOL_PAGE_RETRY_TIMES = 2
+
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
@@ -54,6 +58,13 @@ ROBOTSTXT_OBEY = True
 #    'practice_one.middlewares.PracticeOneDownloaderMiddleware': 543,
 #}
 
+DOWNLOADER_MIDDLEWARES = {
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+ }
+
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
@@ -86,3 +97,14 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# ROTATING_PROXY_LIST = [
+#     '23.96.95.191:3128',
+#     '110.78.114.161:8080',
+#     '5.131.243.11:8080',
+#     '197.248.42.111:8080',
+#     '4.53.28.242:80'
+# ]
+ROTATING_PROXY_LIST = [
+    '4.53.28.242:80'
+]
